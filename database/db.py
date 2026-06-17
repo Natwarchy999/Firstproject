@@ -7,7 +7,11 @@ Base=declarative_base()
 
 engine=create_engine(url=settings.DB_CONNECTION)
 
-LocalSession=sessionmaker(bind=engine)
+LocalSession=sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine
+    )
 
 def get_db():
     session=LocalSession()
