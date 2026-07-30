@@ -1,5 +1,5 @@
-from sqlalchemy import Column,INTEGER,String,Boolean,Float
-from database.db import Base
+from sqlalchemy import Column, INTEGER, String, Boolean, Float
+from app.core.db import Base
 
 class EmployeeDetails(Base):
     __tablename__="employee"
