@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends,UploadFile,File
+from fastapi import APIRouter, Depends,UploadFile,File,Request
 from app.dependencies.auth import get_current_user
 from fastapi.security import OAuth2PasswordRequestForm
-from app.schemas.user import UserCreate
-from app.services.auth_service import login_user, register_user, logout_user, delete_account, profile_access,upload_file,get_file,fetch_api
-
+from app.schemas.user import UserCreate,PromptRequest
+from app.services.auth_service import login_user, register_user, logout_user, delete_account, profile_access,upload_file,get_file,get_posts,get_news,pagination,caching,generate_new_quotes
+from app.dependencies.limiter import limiter
 
 
 router = APIRouter()
@@ -33,9 +33,34 @@ def upload(file: UploadFile=File(...)):
     return upload_file(file)
 
 @router.get("/get_file={filename}")
-def get(filename:str):
+def get_f(filename:str):
     return get_file(filename)
 
-@router.get("/fetch")
-def fetch():
-    return fetch_api();
+@router.get("/posts")
+def get_p():
+    return get_posts()
+
+@router.get("/news")
+@limiter.limit("5/minutes")
+def news(request:Request):
+    return get_news(request)
+
+@router.get("/bulk_news")
+def bulk_news(page: int=1 ,limit:int=5):
+    return pagination(page,limit)
+
+@router.get("/cache")
+def cache():
+    return caching()
+
+
+
+# ai generation 
+@router.post("/generate_qoutes")
+def generate_qoutes(data:PromptRequest):
+
+    result=generate_new_quotes(data.prompt)
+    return {
+        "success":True,
+        "response":result
+    }

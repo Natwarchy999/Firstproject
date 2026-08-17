@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from app.core.db import Base, engine
 from app.routes.auth import router as auth_router
-from fastapi.middleware.cors import CORSMiddleware
-from app.core.settings import settings
+from app.dependencies.limiter import limiter
+from app.middleware.cors import cors_setup
 
 
 app = FastAPI(title="FastAPI Backend")
@@ -15,15 +15,18 @@ def root():
         "message": "API is running",
     }
 
+#1 cors setup
+cors_setup(app)
+
+#2 for rate limiting 
+app.state.limiter = limiter
+
+#3 for routing 
 app.include_router(auth_router)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins =settings.ORIGINS,
-    allow_credentials = True,
-    allow_methods =["*"],
-    allow_headers =["*"]
-)
+
+
+
 
 
 

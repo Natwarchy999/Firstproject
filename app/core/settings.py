@@ -6,6 +6,9 @@ class Settings(BaseSettings):
 
     DB_CONNECTION: str
     ORIGINS : str
+    REDIS_URL:str
+    OPENAI_API_KEY:str
+    GEMINI_API_KEY:str
 
 settings=Settings()
 

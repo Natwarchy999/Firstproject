@@ -1,88 +1,94 @@
 import { useState } from "react";
-import axios from "axios" 
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-function Register(){
-    
-  const [form ,setForm]=useState({
-    name:"",
-    email:"",
-    password:""
-  })
-  
-  const [message,setMessage]=useState(null)
+function Register() {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
 
-  const handleSubmit = async (e)=>{
+  const [message, setMessage] = useState(null);
+  const [isError, setIsError] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try{
-      const response=await axios.post("http://localhost:8000/register",form);
-      console.log(response.data.message)
-      setMessage(response.data.message)
-
-    }
-
-    catch(error) {
-        console.log(error.response.data)
-        console.log(error.response.data.detail)
-        setMessage(error.response.data.detail)
+    try {
+      const response = await axios.post("http://localhost:8000/register", form);
+      setMessage(response.data.message || "Registration successful");
+      setIsError(false);
+    } catch (error) {
+      const detail = error.response?.data?.detail || "Registration failed.";
+      setMessage(detail);
+      setIsError(true);
     }
   };
 
-return (
-    <>
-   <div style={styles.container}>
+  return (
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-card__header">
+          <h2>Create account</h2>
+          <p>Join us and start managing your tasks</p>
+        </div>
 
-    <form style={styles.card} onSubmit={handleSubmit}>
-      <input 
-      placeholder="Enter your name"
-      type="text"
-      value={form.name}
-      required
-      onChange={(e)=>setForm({...form,name:e.target.value})}
-      />
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <label className="auth-field">
+            <span>Full name</span>
+            <input
+              placeholder="Enter your name"
+              type="text"
+              value={form.name}
+              required
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
+          </label>
 
-      <input 
-      placeholder="Enter your email"
-      type="email"
-      value={form.email}
-      required
-      onChange={(e)=>setForm({...form,email:e.target.value})}
-      />
+          <label className="auth-field">
+            <span>Email address</span>
+            <input
+              placeholder="Enter your email"
+              type="email"
+              value={form.email}
+              required
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+          </label>
 
-      <input 
-      placeholder="Enter your password"
-      type="password"
-      value={form.password}
-      r
-      onChange={(e)=>setForm({...form,password:e.target.value})}
-      />
-      <button type="submit">Register</button>
-     </form>
-     <button type="submit">Login</button>
-         {message ? <p style={styles.message}>{message}</p> : null}
+          <label className="auth-field">
+            <span>Password</span>
+            <input
+              placeholder="Enter your password"
+              type="password"
+              value={form.password}
+              required
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+            />
+          </label>
 
-   </div>
-    </>
-  )
-}
+          <button className="auth-button" type="submit">
+            Register
+          </button>
 
-const styles = {
-  container: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
-  },
-  card: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "15px",
-    width: "300px",
-  },
-  message: {
-    margin: 0,
-    color: "green",
-  },
+          {message ? (
+            <p className={`auth-message ${isError ? "auth-message--error" : ""}`}>
+              {message}
+            </p>
+          ) : null}
+        </form>
+
+        <p className="auth-switch">
+          Already have an account?
+          <button type="button" className="auth-link-button" onClick={() => navigate("/login")}>
+            Login
+          </button>
+        </p>
+      </div>
+    </div>
+  );
 }
 
 export default Register

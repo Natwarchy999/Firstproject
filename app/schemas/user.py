@@ -5,4 +5,6 @@ class UserCreate(BaseModel):
     email:EmailStr
     password:str
 
+class PromptRequest(BaseModel):
+    prompt:str 
 
